@@ -42,7 +42,17 @@ export function AdminEnrollmentsTable() {
   }
 
   useEffect(() => {
-    load();
+    let ignore = false;
+    (async () => {
+      const res = await fetch("/api/admin/enrollments");
+      if (res.ok && !ignore) {
+        const data = await res.json();
+        setRows(data.enrollments);
+      }
+    })();
+    return () => {
+      ignore = true;
+    };
   }, []);
 
   if (!rows) return <p className="text-sm text-white/40">Loading enrollments…</p>;

@@ -7,7 +7,6 @@ import { business } from "./config";
 // authenticated admin dashboard.
 export async function notifyAdminOfNewEnrollment(params: { agreementId: string; studentName: string }) {
   const to = business.adminNotificationEmail;
-  // eslint-disable-next-line no-console
   console.log(
     `[notify] New enrollment ${params.agreementId} from ${params.studentName} pending review. ` +
       `Would notify admin at ${to} (email delivery not configured — review in admin dashboard).`
