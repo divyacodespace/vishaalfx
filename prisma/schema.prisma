@@ -1,0 +1,129 @@
+// VishaalFX database schema
+// NOTE: legal/compliance-relevant fields (e.g. document versions, retention)
+// should be reviewed by a qualified legal professional before production use.
+
+generator client {
+  provider   = "prisma-client-js"
+  engineType = "binary"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum EnrollmentStatus {
+  IN_PROGRESS
+  PENDING_REVIEW
+  APPROVED
+  REJECTED
+}
+
+// A "user" here is a prospective participant going through detail collection
+// and digital consent. Created at the start of the Join Now flow (student
+// details step) and filled in progressively. There is no course or
+// curriculum concept in this app — its sole purpose is to collect signed
+// consent (Terms / Privacy / Risk Disclosure) and generate an admin-only
+// signed agreement record. Contact fields (email, mobile) and date of birth
+// are self-declared by the registrant and not independently verified.
+model User {
+  id              String   @id @default(cuid())
+  fullName        String?
+  email           String?
+  countryCode     String?
+  mobile          String? // E.164-ish digits only, no formatting
+  city            String?
+  institution     String?
+  occupation      String?
+  dateOfBirth     DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  sessionTokenHash String? // hash of the current session token (rotation support)
+
+  consent          Consent?
+  signature        Signature?
+  agreement        Agreement?
+  auditLogs        AuditLog[]
+
+  @@index([mobile])
+  @@index([email])
+}
+
+model Consent {
+  id               String   @id @default(cuid())
+  userId           String   @unique
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  termsVersion     String
+  termsAccepted    Boolean  @default(false)
+  termsAcceptedAt  DateTime?
+
+  privacyVersion   String
+  privacyAccepted  Boolean  @default(false)
+  privacyAcceptedAt DateTime?
+
+  riskVersion      String
+  riskAccepted     Boolean  @default(false)
+  riskAcceptedAt   DateTime?
+
+  finalConsentAt   DateTime? // timestamp of the combined consent screen confirmation
+  ipAddress        String?
+  userAgent        String?
+}
+
+model Signature {
+  id                  String   @id @default(cuid())
+  userId              String   @unique
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fullLegalName       String
+  signatureStoragePath String  // private storage path, never public
+  documentHash        String  // SHA-256 hash of the signature image bytes
+  signedAt            DateTime @default(now())
+  ipAddress           String?
+  userAgent           String?
+}
+
+model Agreement {
+  id                String    @id @default(cuid())
+  userId            String    @unique
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  agreementVersion  String
+  pdfStoragePath    String?   // private storage path, admin-only access
+  pdfDocumentHash   String?
+  docxStoragePath   String?   // private storage path, admin-only access — editable working copy, not the audited record
+  docxDocumentHash  String?
+  status            EnrollmentStatus @default(IN_PROGRESS)
+  createdAt         DateTime  @default(now())
+  submittedAt       DateTime?
+  approvedAt        DateTime?
+  approvedBy        String?   // AdminUser.id
+  rejectedAt        DateTime?
+  rejectedBy        String?
+  rejectionReason   String?
+}
+
+model AdminUser {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         String   @default("admin")
+  createdAt    DateTime @default(now())
+  lastLoginAt  DateTime?
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  actorType String // "student" | "admin" | "system"
+  actorId   String?
+  action    String
+  metadata  Json?
+  ipAddress String?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([action, createdAt])
+}
