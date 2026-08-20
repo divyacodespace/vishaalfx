@@ -6,6 +6,8 @@ import { finalConsentSchema } from "@/lib/validation";
 import { prisma } from "@/lib/db";
 import { logAudit, getClientIp } from "@/lib/audit";
 
+export const dynamic = "force-dynamic";
+
 export async function POST(req: NextRequest) {
   try {
     const user = await requireDocumentsAccepted();

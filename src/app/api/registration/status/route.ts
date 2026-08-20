@@ -3,6 +3,8 @@ import { cookies } from "next/headers";
 import { prisma } from "@/lib/db";
 import { STUDENT_SESSION_COOKIE, verifyStudentToken } from "@/lib/session";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   const token = (await cookies()).get(STUDENT_SESSION_COOKIE)?.value;
   const payload = token ? verifyStudentToken(token) : null;

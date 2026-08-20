@@ -3,8 +3,13 @@
 // should be reviewed by a qualified legal professional before production use.
 
 generator client {
-  provider   = "prisma-client-js"
-  engineType = "binary"
+  provider      = "prisma-client-js"
+  engineType    = "binary"
+  // "native" covers whatever platform runs `prisma generate` (e.g. this dev
+  // machine); rhel-openssl-3.0.x is required for Vercel's Linux build/runtime
+  // — without it, the query engine binary for Vercel's platform never gets
+  // downloaded and Prisma fails at runtime with a misleading connection error.
+  binaryTargets = ["native", "rhel-openssl-3.0.x"]
 }
 
 datasource db {

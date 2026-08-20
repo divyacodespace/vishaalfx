@@ -10,6 +10,8 @@ import { logAudit, getClientIp } from "@/lib/audit";
 // .docx copy of the enrollment agreement. The PDF (see .../pdf/route.ts) is the
 // tamper-evident document of record; this is a convenience copy. Never served
 // from a public path or predictable URL.
+export const dynamic = "force-dynamic";
+
 export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   try {

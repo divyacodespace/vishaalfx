@@ -6,6 +6,8 @@ import { errorResponse, ApiError } from "@/lib/apiError";
 import { rejectEnrollmentSchema } from "@/lib/validation";
 import { logAudit, getClientIp } from "@/lib/audit";
 
+export const dynamic = "force-dynamic";
+
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   try {

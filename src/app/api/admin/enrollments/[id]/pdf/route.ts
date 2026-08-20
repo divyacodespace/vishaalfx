@@ -8,6 +8,8 @@ import { logAudit, getClientIp } from "@/lib/audit";
 
 // Admin-only, authorization-checked-on-every-request download of the signed
 // enrollment PDF. Never served from a public path or predictable URL.
+export const dynamic = "force-dynamic";
+
 export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   try {

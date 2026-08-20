@@ -6,6 +6,8 @@ import { errorResponse, ApiError } from "@/lib/apiError";
 import { readPrivateFile } from "@/lib/storage";
 import { logAudit, getClientIp } from "@/lib/audit";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   try {

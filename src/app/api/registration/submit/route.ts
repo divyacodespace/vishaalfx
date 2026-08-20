@@ -11,6 +11,8 @@ import { sha256Hex, generateAgreementId } from "@/lib/crypto";
 import { logAudit, getClientIp } from "@/lib/audit";
 import { sendAgreementEmails, maskMobile } from "@/lib/notify";
 
+export const dynamic = "force-dynamic";
+
 export async function POST(_req: NextRequest) {
   try {
     const user = await requireSignature();

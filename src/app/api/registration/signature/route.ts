@@ -8,6 +8,8 @@ import { savePrivateFile } from "@/lib/storage";
 import { sha256Hex } from "@/lib/crypto";
 import { logAudit, getClientIp } from "@/lib/audit";
 
+export const dynamic = "force-dynamic";
+
 export async function POST(req: NextRequest) {
   try {
     const user = await requireFinalConsent();

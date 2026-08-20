@@ -7,6 +7,8 @@ import { prisma } from "@/lib/db";
 import { CURRENT_PRIVACY_VERSION, CURRENT_RISK_VERSION, CURRENT_TERMS_VERSION } from "@/lib/config";
 import { logAudit, getClientIp } from "@/lib/audit";
 
+export const dynamic = "force-dynamic";
+
 export async function POST(req: NextRequest) {
   try {
     const user = await requireDetailsComplete();

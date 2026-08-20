@@ -4,6 +4,8 @@ import { requireAdmin } from "@/lib/adminGuard";
 import { errorResponse } from "@/lib/apiError";
 import { maskMobile } from "@/lib/notify";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   try {
     await requireAdmin();

@@ -13,6 +13,8 @@ const attempts = new Map<string, { count: number; resetAt: number }>();
 const MAX_ATTEMPTS = 8;
 const WINDOW_MS = 15 * 60 * 1000;
 
+export const dynamic = "force-dynamic";
+
 export async function POST(req: NextRequest) {
   try {
     const ip = getClientIp(await headers()) ?? "unknown";

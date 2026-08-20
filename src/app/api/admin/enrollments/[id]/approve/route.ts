@@ -5,6 +5,8 @@ import { requireAdmin } from "@/lib/adminGuard";
 import { errorResponse, ApiError } from "@/lib/apiError";
 import { logAudit, getClientIp } from "@/lib/audit";
 
+export const dynamic = "force-dynamic";
+
 export async function POST(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   try {
