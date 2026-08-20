@@ -9,7 +9,7 @@ import { generateAgreementDocx } from "@/lib/docx/generateAgreementDocx";
 import { readPrivateFile, savePrivateFile } from "@/lib/storage";
 import { sha256Hex, generateAgreementId } from "@/lib/crypto";
 import { logAudit, getClientIp } from "@/lib/audit";
-import { notifyAdminOfNewEnrollment, maskMobile } from "@/lib/notify";
+import { sendAgreementEmails, maskMobile } from "@/lib/notify";
 
 export async function POST(_req: NextRequest) {
   try {
@@ -89,7 +89,12 @@ export async function POST(_req: NextRequest) {
     });
 
     await logAudit({ userId: user.id, actorType: "student", action: "agreement_submitted", metadata: { agreementId }, ipAddress: ip });
-    await notifyAdminOfNewEnrollment({ agreementId, studentName: user.fullName ?? "Unknown" });
+    await sendAgreementEmails({
+      agreementId,
+      studentName: user.fullName ?? "Unknown",
+      studentEmail: user.email,
+      pdfBuffer,
+    });
 
     return NextResponse.json({ success: true, agreementId });
   } catch (err) {

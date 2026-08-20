@@ -7,20 +7,14 @@ import { SignaturePad, SignaturePadHandle } from "./SignaturePad";
 
 export function SignatureStep({ onComplete }: { onComplete: () => void }) {
   const [fullLegalName, setFullLegalName] = useState("");
-  const [mode, setMode] = useState<"draw" | "type">("draw");
   const [empty, setEmpty] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const padRef = useRef<SignaturePadHandle>(null);
 
-  function useTypedSignature() {
-    if (!fullLegalName.trim()) return;
-    padRef.current?.drawText(fullLegalName.trim());
-  }
-
   async function submit() {
     if (!padRef.current || padRef.current.isEmpty()) {
-      setError("Please provide your signature before continuing.");
+      setError("Please draw your signature before continuing.");
       return;
     }
     setLoading(true);
@@ -56,31 +50,13 @@ export function SignatureStep({ onComplete }: { onComplete: () => void }) {
         />
       </label>
 
-      <div className="mt-5 flex items-center justify-between">
-        <span className="text-xs font-medium text-white/60">
-          {mode === "draw" ? "Draw your signature" : "Typed signature preview"}
-        </span>
-        <button
-          type="button"
-          className="text-xs text-accent hover:underline"
-          onClick={() => {
-            setMode((m) => (m === "draw" ? "type" : "draw"));
-            padRef.current?.clear();
-          }}
-        >
-          {mode === "draw" ? "Type instead" : "Draw instead"}
-        </button>
+      <div className="mt-5">
+        <span className="text-xs font-medium text-white/60">Draw your signature</span>
       </div>
 
       <div className="mt-2">
         <SignaturePad ref={padRef} onChangeEmpty={setEmpty} />
       </div>
-
-      {mode === "type" && (
-        <Button size="sm" variant="secondary" className="mt-3" onClick={useTypedSignature} disabled={!fullLegalName.trim()}>
-          Use typed signature
-        </Button>
-      )}
 
       <div className="mt-3 flex gap-3">
         <Button

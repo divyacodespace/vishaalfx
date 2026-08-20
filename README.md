@@ -1,9 +1,9 @@
 # VishaalFX — Trading Course Enrollment Platform
 
 A Next.js (App Router) + TypeScript + Tailwind CSS + PostgreSQL/Prisma application implementing the full
-enrollment flow: age verification → student details (name, email, DOB, optional mobile) → Terms/Privacy/Risk
-documents → combined consent → digital signature → signed PDF generation → admin-only review/approval →
-gated course access.
+enrollment flow: student details (name, email, DOB — 18+ self-declared, optional mobile) → single Terms &
+Consent checkbox (Terms/Privacy/Risk Disclosure, viewable in full before agreeing) → digital signature →
+signed PDF generated and emailed to the student and admin → admin-only review/approval → gated course access.
 
 **The Course fee is ₹50,000 (INR) — see `src/content/legal.ts` (`courseFee`). No in-app payment/checkout
 flow is implemented; fee collection currently happens outside this codebase (e.g. bank transfer/offline),
@@ -65,7 +65,8 @@ Then edit `.env`:
 | `DATABASE_URL` | Your [Supabase](https://supabase.com) PostgreSQL connection string — Project Settings → Database → Connection string → URI ("Direct connection", port 5432). Paste it in as-is; Prisma needs nothing else changed. |
 | `STUDENT_SESSION_SECRET` / `ADMIN_SESSION_SECRET` | Generate with `openssl rand -hex 32` (two different values). |
 | `ADMIN_SEED_EMAIL` / `ADMIN_SEED_PASSWORD` / `ADMIN_SEED_NAME` | Used once by `npm run seed` to create the first admin login. Change the password after first login. |
-| `ADMIN_NOTIFICATION_EMAIL` | The verified mailbox that should be notified of new submissions (no PDF is ever emailed — see `src/lib/notify.ts`). |
+| `ADMIN_NOTIFICATION_EMAIL` | The verified mailbox that receives the signed agreement PDF on every new submission — see `RESEND_API_KEY` below and `src/lib/notify.ts`. |
+| `RESEND_API_KEY`, `RESEND_FROM_EMAIL` | Required to actually send the signed agreement PDF to the student and to `ADMIN_NOTIFICATION_EMAIL` on submission. Get a free API key at [resend.com](https://resend.com) (3,000 emails/month free). `RESEND_FROM_EMAIL` must be on a domain verified in Resend — their default `onboarding@resend.dev` sender can only deliver to your own Resend account email, not real students. Without `RESEND_API_KEY`, email sending safely no-ops (logs only); registration still works. |
 | `STORAGE_DRIVER`, `S3_*` | Leave `STORAGE_DRIVER=local` for development (files land in `private-storage/`, which is gitignored and never served publicly). **For production on Vercel or any serverless host, you must set `STORAGE_DRIVER=s3`** — the local filesystem is ephemeral there. Fill in `S3_BUCKET`/`S3_REGION`/`S3_ACCESS_KEY_ID`/`S3_SECRET_ACCESS_KEY` (works with AWS S3, or any S3-compatible provider via `S3_ENDPOINT` — Cloudflare R2, Backblaze B2, Supabase Storage, MinIO). The bucket must stay private (no public-read policy) — files are only ever served through the authenticated admin API routes. |
 | `ESIGN_PROVIDER`, `ESIGN_API_KEY`, `ESIGN_API_SECRET` | Only needed if you integrate a compliant third-party e-sign provider in place of (or in addition to) the in-app drawn signature — see the note in `src/components/enroll/SignatureStep.tsx`. |
 | `BUSINESS_*` | Legal entity name, address, support contact, jurisdiction. Do not launch with the placeholder values. |
@@ -110,7 +111,10 @@ Risk Disclosure accepted · final consent confirmed · signature captured · **a
 - Admin passwords are bcrypt-hashed.
 - The signed PDF and signature image are stored under `private-storage/` with random, unguessable filenames
   and are served only through authenticated, admin-authorized API routes (`/api/admin/enrollments/[id]/pdf`
-  and `.../signature`) — never a public path.
+  and `.../signature`) — never a public path. The signed PDF is also emailed directly to the student and to
+  `ADMIN_NOTIFICATION_EMAIL` on submission (see `RESEND_API_KEY` above) — a deliberate tradeoff of convenience
+  over the stricter "PDF never leaves authenticated storage" posture; if that matters for your compliance
+  needs, remove the attachment in `src/lib/notify.ts` and link into the admin dashboard instead.
 - Session cookies are `httpOnly`, `sameSite=strict`, and `secure` in production; student and admin sessions
   use separate secrets/cookies.
 - All mutating API routes validate input with `zod` and re-check authorization server-side.
@@ -119,5 +123,4 @@ Risk Disclosure accepted · final consent confirmed · signature captured · **a
 
 ## What's intentionally a stub
 
-- `src/lib/notify.ts` — real transactional email for admin notifications (currently logs only)
 - A production-grade e-sign provider integration, if a legally recognized (non-drawn) signature is required

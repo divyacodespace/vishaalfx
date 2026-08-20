@@ -8,3 +8,5 @@ private-storage/
 *.log
 .DS_Store
 next-env.d.ts
+prisma/*.db
+prisma/*.db-journal

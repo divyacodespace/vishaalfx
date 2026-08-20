@@ -12,13 +12,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum EnrollmentStatus {
-  IN_PROGRESS
-  PENDING_REVIEW
-  APPROVED
-  REJECTED
-}
-
 // A "user" here is a prospective participant going through detail collection
 // and digital consent. Created at the start of the Join Now flow (student
 // details step) and filled in progressively. There is no course or
@@ -93,7 +86,10 @@ model Agreement {
   pdfDocumentHash   String?
   docxStoragePath   String?   // private storage path, admin-only access — editable working copy, not the audited record
   docxDocumentHash  String?
-  status            EnrollmentStatus @default(IN_PROGRESS)
+  // "IN_PROGRESS" | "PENDING_REVIEW" | "APPROVED" | "REJECTED" — a plain
+  // String because SQLite (used for local dev) doesn't support native enums;
+  // validated at the application layer instead.
+  status            String    @default("IN_PROGRESS")
   createdAt         DateTime  @default(now())
   submittedAt       DateTime?
   approvedAt        DateTime?
@@ -120,7 +116,9 @@ model AuditLog {
   actorType String // "student" | "admin" | "system"
   actorId   String?
   action    String
-  metadata  Json?
+  // JSON-serialized string — SQLite (used for local dev) has no native Json
+  // type. Written/read via JSON.stringify/parse in src/lib/audit.ts.
+  metadata  String?
   ipAddress String?
   createdAt DateTime @default(now())
 

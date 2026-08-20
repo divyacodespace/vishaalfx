@@ -14,7 +14,7 @@ export async function logAudit(params: {
       actorType: params.actorType,
       actorId: params.actorId ?? undefined,
       action: params.action,
-      metadata: params.metadata as any,
+      metadata: params.metadata ? JSON.stringify(params.metadata) : undefined,
       ipAddress: params.ipAddress ?? undefined,
     },
   });

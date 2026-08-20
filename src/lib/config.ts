@@ -25,6 +25,13 @@ export const business = {
   adminNotificationEmail: process.env.ADMIN_NOTIFICATION_EMAIL ?? "admin@example.com",
 };
 
+export const emailConfig = {
+  resendApiKey: process.env.RESEND_API_KEY ?? "",
+  // Must be an address on a domain verified in Resend (or their onboarding@resend.dev
+  // test sender, which can only deliver to the Resend account's own email).
+  fromEmail: process.env.RESEND_FROM_EMAIL ?? "VishaalFX <onboarding@resend.dev>",
+};
+
 export const storageConfig = {
   driver: process.env.STORAGE_DRIVER ?? "local",
   localRoot: process.env.LOCAL_STORAGE_ROOT ?? "./private-storage",

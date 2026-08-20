@@ -6,7 +6,6 @@ export interface SignaturePadHandle {
   clear: () => void;
   isEmpty: () => boolean;
   toDataUrl: () => string;
-  drawText: (text: string) => void;
 }
 
 export const SignaturePad = forwardRef<SignaturePadHandle, { onChangeEmpty?: (empty: boolean) => void }>(
@@ -78,22 +77,6 @@ export const SignaturePad = forwardRef<SignaturePadHandle, { onChangeEmpty?: (em
       },
       toDataUrl() {
         return canvasRef.current?.toDataURL("image/png") ?? "";
-      },
-      drawText(text: string) {
-        const canvas = canvasRef.current;
-        const ctx = canvas?.getContext("2d");
-        if (!canvas || !ctx) return;
-        const dpr = window.devicePixelRatio || 1;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        const cssWidth = canvas.width / dpr;
-        const cssHeight = canvas.height / dpr;
-        ctx.font = "italic 32px Georgia, 'Times New Roman', serif";
-        ctx.fillStyle = "#e6ebf2";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillText(text, cssWidth / 2, cssHeight / 2);
-        hasStrokes.current = text.trim().length > 0;
-        onChangeEmpty?.(!hasStrokes.current);
       },
     }));
 

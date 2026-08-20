@@ -1,6 +1,6 @@
 "use client";
 
-const STEPS = ["Details", "Documents", "Consent", "Signature", "Submission"];
+const STEPS = ["Details", "Terms", "Signature", "Submission"];
 
 export function StepProgress({ current }: { current: number }) {
   return (
