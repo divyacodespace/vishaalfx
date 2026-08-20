@@ -42,7 +42,7 @@ export function DetailsStep({ onComplete }: { onComplete: () => void }) {
           city,
           institution,
           occupation,
-          countryCode: mobile ? countryCode : "",
+          countryCode,
           mobile,
         }),
       });
@@ -59,7 +59,12 @@ export function DetailsStep({ onComplete }: { onComplete: () => void }) {
     }
   }
 
-  const canSubmit = fullName.trim().length > 1 && /\S+@\S+\.\S+/.test(email) && dateOfBirth;
+  const canSubmit =
+    fullName.trim().length > 1 &&
+    /\S+@\S+\.\S+/.test(email) &&
+    dateOfBirth &&
+    /^\+\d{1,4}$/.test(countryCode) &&
+    /^\d{6,14}$/.test(mobile);
 
   return (
     <StepShell title="Student Details" subtitle="Only the information required to process your enrollment.">
@@ -73,7 +78,7 @@ export function DetailsStep({ onComplete }: { onComplete: () => void }) {
         </div>
         <Field label="Student / Occupation Status" value={occupation} onChange={(e) => setOccupation(e.target.value)} placeholder="Optional" />
         <div>
-          <span className="mb-1.5 block text-xs font-medium text-white/60">Mobile Number (optional)</span>
+          <span className="mb-1.5 block text-xs font-medium text-white/60">Mobile Number *</span>
           <div className="flex gap-3">
             <input
               value={countryCode}
@@ -85,7 +90,7 @@ export function DetailsStep({ onComplete }: { onComplete: () => void }) {
               value={mobile}
               onChange={(e) => setMobile(e.target.value.replace(/\D/g, ""))}
               className="flex-1 rounded-lg border border-white/10 bg-base-800 px-3 py-2.5 text-sm text-white outline-none focus:border-accent"
-              placeholder="Optional"
+              placeholder="Mobile number"
               inputMode="numeric"
             />
           </div>

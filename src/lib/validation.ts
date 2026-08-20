@@ -10,15 +10,11 @@ export const studentDetailsSchema = z.object({
   countryCode: z
     .string()
     .trim()
-    .regex(/^\+\d{1,4}$/, "Enter a valid country code, e.g. +91")
-    .optional()
-    .or(z.literal("")),
+    .regex(/^\+\d{1,4}$/, "Enter a valid country code, e.g. +91"),
   mobile: z
     .string()
     .trim()
-    .regex(/^\d{6,14}$/, "Enter a valid mobile number")
-    .optional()
-    .or(z.literal("")),
+    .regex(/^\d{6,14}$/, "Enter a valid mobile number"),
 });
 
 export const consentDocumentsSchema = z.object({
